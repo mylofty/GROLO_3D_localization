@@ -134,7 +134,7 @@ def localizatiion_GROLO_moreparent(robots, localization_Nodes):
     # write to file GROLO_result.npy
     grolo_list = []
     for r in robots:
-        grolo_list.append(r.get_coord())
+        grolo_list.append(np.array(list(r.get_coord())+[r.z]))
     np.savetxt(os.path.join(folder, GROLO_result), grolo_list)
 
 
@@ -174,8 +174,8 @@ def main():
     for index in range(len(points)):
         print('robot[{}] real_z : estimate_z : {} - {} = {}'.format(index, points[index][2], zList[index], points[index][2]- zList[index]))
 
-    # localization_gradient_descent(robots, psolver,  epochs=0)
-    # localizatiion_GROLO_moreparent(robots, robot_Num - flexiblecount - beacon_Num)
+    localization_gradient_descent(robots, psolver,  epochs=15)
+    localizatiion_GROLO_moreparent(robots, robot_Num - flexiblecount - beacon_Num)
 
 
 

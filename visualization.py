@@ -228,6 +228,8 @@ def TExtension_picture(folder = folder, random_node_filename = random_node_filen
 def show3d(folder = folder, random_node_filename = random_node_filename,
                                  GROLO_node_filename = GROLO_result):
     fig = plt.figure()
+    plt.xlabel("X")
+    plt.ylabel("Y")
     plt.title('compare: GROLO')
     list = np.loadtxt(os.path.join(folder, beacon_node_filename))
     Beacon1List = np.array(list[0:len(list) - 1], dtype=int)
@@ -237,8 +239,8 @@ def show3d(folder = folder, random_node_filename = random_node_filename,
     plt.ylim(-2, 110)
 
     ax = Axes3D(fig)
-    ax.scatter(old[:, 0], old[:, 1], old[:, 2], s=20, c='r')
-    # ax.scatter(old[:, 0], old[:, 1], 0,s=20, c='b')
+    ax.scatter(old[:, 0], old[:, 1], old[:, 2], c='', edgecolors='b', marker='o', s=60, label = 'real position')
+    ax.scatter(new[:, 0], new[:, 1], new[:, 2], c='r', marker='+', s=60, label='estimated position')
     plotx = []
     ploty = []
     plotz = []
@@ -254,12 +256,16 @@ def show3d(folder = folder, random_node_filename = random_node_filename,
     # ax.scatter(plotx, ploty, plotz, s=20, c='r')
     # ax.scatter(16, 16, 5, s=2, c='b')
     # ax.scatter(0, 0, -2, s=2, c='b')
+    for index in range(len(old)):
+        ax.text(old[index][0], old[index][1],old[index][2], index.__str__())
+        # ax.text(new[index][0], new[index][1], new[index][2], index.__str__())
 
     X = np.arange(-2, 116, 0.1)
     Y = np.arange(-4, 116, 0.1)
     Z = np.zeros((1, len(X)))
-    # X, Y = np.meshgrid(X, Y)  # XY平面的网格数据
-    # ax.plot_surface(X, Y, Z, rstride=8, cstride=8,color='y', alpha=0.3)
+    X, Y = np.meshgrid(X, Y)  # XY平面的网格数据
+    ax.plot_surface(X, Y, Z, rstride=8, cstride=8,color='y', alpha=0.3)
+    plt.legend()
     plt.show()
 
 
@@ -268,5 +274,5 @@ if __name__ == '__main__':
     # compare_random_dvdistance_picture()
     # compare_random_Gradient_picture()
     # TExtension_picture()
-    # compare_random_GROLO_picture()
+    compare_random_GROLO_picture()
 
