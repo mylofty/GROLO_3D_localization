@@ -36,8 +36,11 @@ def create_network_topology():
     for i in range(robot_Num):
         for j in range(i+1, robot_Num):
             np.random.seed(12345)
+            # square_distance = (points[i][0] - points[j][0])**2 + (points[i][1] - points[j][1])**2 \
+            #                         + (points[i][2] - points[j][2])**2
+
             tempDistance = np.sqrt( (points[i][0] - points[j][0])**2 + (points[i][1] - points[j][1])**2
-                                    + (points[i][2] - points[i][2])**2)
+                                    + (points[i][2] - points[j][2])**2)
             # tempDistance = tempDistance + tempDistance * (np.random.random() * 0.02 - 0.01)  # 是否加噪声
             if tempDistance < communication_distance:
                 robots[i].myNeighbor.append([j, tempDistance])
@@ -50,9 +53,9 @@ def create_network_topology():
             rid = r.id
             nid = nei[0]
             r.nei_id.append(nid)
-            r.measured_distance[nid] = np.sqrt((points[rid][0]-points[nid][0])**2 +
-                    (points[rid][1]-points[nid][1])**2 +
-                    (points[rid][2]+r.t-points[nid][2])**2 )
+            r.measured_distance[nid] = np.sqrt((points[rid][0]-points[nid][0])**2 \
+                                              + (points[rid][1]-points[nid][1])**2 + \
+                                              (points[rid][2]+r.t-points[nid][2])**2)
     return points, robots
 
 
@@ -84,6 +87,7 @@ def localization_gradient_descent(robots, psolver, epochs=2):
     # write to file gradient_descent_result.npy
     gd_list = []
     for r in robots:
+        print('robots[{}] z is ', r.id, r.z)
         gd_list.append(r.get_coord())
     np.savetxt(os.path.join(folder, gradient_descent_result), gd_list)
 
@@ -135,47 +139,6 @@ def localizatiion_GROLO_moreparent(robots, localization_Nodes):
 
 
 
-def localizatiion_GROLO_singleparent(robots, localization_Nodes):
-    cal_nodes = 0
-    for index in range(len(robots)):
-        if robots[index].isBeacon == False:
-            robots[index].isFinalPos = False
-        else:
-            robots[index].isFinalPos = True
-    print('real_position: localizationNodes is ', localization_Nodes)
-    while cal_nodes < localization_Nodes:
-        for index in range(len(robots)):
-            if robots[index].isBeacon == True:
-                continue
-            if robots[index].isFinalPos == True:
-                continue
-            print('index %d come to calculate, cal_nodes is %d  '% (index, cal_nodes))
-            p1 = robots[index].parent1
-            p2 = robots[index].parent2
-            if(p1 != -1 and p2 != -1 and robots[p1].isFinalPos == True and robots[p2].isFinalPos == True):
-                ix, iy = robots[index].get_coord()
-                p1x, p1y = robots[p1].get_coord()
-                p2x, p2y = robots[p2].get_coord()
-                dis1 = robots[index].d2_distances[p1]
-                dis2 = robots[index].d2_distances[p2]
-                def my_solve(paramter):
-                    x, y = paramter[0], paramter[1]
-                    return [
-                        (x - p1x) ** 2 + (y - p1y) ** 2 - dis1 ** 2,
-                        (x - p2x) ** 2 + (y - p2y) ** 2 - dis2 ** 2]
-                sol = np.real(fsolve(my_solve, np.array([ix, iy]), xtol=1e-3))
-                print('fsolve index ',index,sol)
-                robots[index].set_coord([sol[0], sol[1]])
-                robots[index].isFinalPos = True
-                cal_nodes = cal_nodes + 1
-    # write to file GROLO_result.npy
-    grolo_list = []
-    for r in robots:
-        grolo_list.append(r.get_coord())
-    np.savetxt(os.path.join(folder, GROLO_result), grolo_list)
-
-
-
 def _optLeastSqCircle(x, y, d, initx, inity):
     def calcR(x, y, xc, yc):
         '''
@@ -211,7 +174,7 @@ def main():
     for index in range(len(points)):
         print('robot[{}] real_z : estimate_z : {} - {} = {}'.format(index, points[index][2], zList[index], points[index][2]- zList[index]))
 
-    # localization_gradient_descent(robots, psolver,  epochs=15)
+    # localization_gradient_descent(robots, psolver,  epochs=0)
     # localizatiion_GROLO_moreparent(robots, robot_Num - flexiblecount - beacon_Num)
 
 

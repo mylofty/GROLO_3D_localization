@@ -13,7 +13,7 @@ class Robot(object):
         # self.neighborsCoord = []  # neighbor's coord [x, y]
 
         self.nei_id = []
-        self.myNeighbor = []  # this is construct like [id, distance], it has been sorted, 3D
+        self.myNeighbor = []  # this is construct like [id, square_distance], it has been sorted, 3D
         # measured_distance is a map,  key is neighbor's id, value is neighbor's distance, it was changed by self.t!!!
         self.measured_distance = {}
         # calculate Z
@@ -100,7 +100,7 @@ class Robot(object):
             if robots[nei[0]].z != None:
                 d1 = nei[1]
                 d2 = self.measured_distance[nei[0]]
-                self.z = (d2**2-d1**2-self.t**2)/(2*self.t) + robots[nei[0]].z # +2*robots[nei[0]].z*self.t
+                self.z = (d2**2-d1**2-self.t**2)/(2*self.t) + robots[nei[0]].z
                 print('calculate_z of robot[{}] using robot[{}], d1 = {}, d2 = {}, z = {}'
                       .format(self.id, nei[0], d1, d2, self.z))
                 return self.z

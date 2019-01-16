@@ -37,7 +37,7 @@ def create_network_topology():
         for j in range(i+1, robot_Num):
             np.random.seed(12345)
             tempDistance = np.sqrt( (points[i][0] - points[j][0])**2 + (points[i][1] - points[j][1])**2
-                                    + (points[i][2] - points[i][2])**2)
+                                    + (points[i][2] - points[j][2])**2)
             # tempDistance = tempDistance + tempDistance * (np.random.random() * 0.02 - 0.01)  # 是否加噪声
             if tempDistance < communication_distance:
                 robots[i].myNeighbor.append([j, tempDistance])
@@ -84,7 +84,9 @@ def localization_gradient_descent(robots, psolver, epochs=2):
     # write to file gradient_descent_result.npy
     gd_list = []
     for r in robots:
-        gd_list.append(r.get_coord())
+        print('r[{}].get_coord()= {}, r.z ={}'.format(r.id, r.get_coord(), r.z), type(r.get_coord()), type(r.z))
+        print('r[{}] coord is {}'.format(r.id, list(r.get_coord())+[r.z]))
+        gd_list.append(np.array(list(r.get_coord())+[r.z]))
     np.savetxt(os.path.join(folder, gradient_descent_result), gd_list)
 
 
@@ -125,7 +127,7 @@ def localizatiion_GROLO(robots, localization_Nodes):
     # write to file GROLO_result.npy
     grolo_list = []
     for r in robots:
-        grolo_list.append(r.get_coord())
+        grolo_list.append(np.array(list(r.get_coord())+[r.z]))
     np.savetxt(os.path.join(folder, GROLO_result), grolo_list)
 
 
@@ -137,8 +139,8 @@ def main():
     parentList, distanceList, zList, flexiblecount = from_3D_to_2D(robots)
     for index in range(len(points)):
         print('robot[{}] real_z : estimate_z : {} - {} = {}'.format(index, points[index][2], zList[index], points[index][2]- zList[index]))
-    # localization_gradient_descent(robots, psolver,  epochs=15)
-    # localizatiion_GROLO(robots, robot_Num - flexiblecount - beacon_Num)
+    localization_gradient_descent(robots, psolver,  epochs=15)
+    localizatiion_GROLO(robots, robot_Num - flexiblecount - beacon_Num)
 
 
 if __name__ == '__main__':
