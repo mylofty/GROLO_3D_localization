@@ -233,39 +233,62 @@ def show3d(folder = folder, random_node_filename = random_node_filename,
     plt.title('compare: GROLO')
     list = np.loadtxt(os.path.join(folder, beacon_node_filename))
     Beacon1List = np.array(list[0:len(list) - 1], dtype=int)
+    parent = np.loadtxt(os.path.join(folder, TE_parent_filename))
     old = np.loadtxt(os.path.join(folder, random_node_filename))
     new = np.loadtxt(os.path.join(folder, GROLO_node_filename))
-    plt.xlim(-2, 110)
-    plt.ylim(-2, 110)
+    plt.xlim(-2, 101)
+    plt.ylim(-2, 101)
 
     ax = Axes3D(fig)
-    ax.scatter(old[:, 0], old[:, 1], old[:, 2], c='', edgecolors='b', marker='o', s=60, label = 'real position')
-    ax.scatter(new[:, 0], new[:, 1], new[:, 2], c='r', marker='+', s=60, label='estimated position')
-    plotx = []
-    ploty = []
-    plotz = []
-    # i = 0
-    # for i, r in enumerate(robots):
-    #     plotx.append(r.get_coord()[0])
-    #     ploty.append(r.get_coord()[1])
-    #     plotz.append(r.z)
-    #     ax.text(r.get_coord()[0], r.get_coord()[1], r.z, i.__str__())
-    #     ax.text(points[i, 0], points[i, 1], 0, i.__str__() + '\'')
-    #     ax.text(points[i, 0], points[i, 1], points[i, 2], i)
-    #     # i = (i + 1) % (len(robots)+1)
-    # ax.scatter(plotx, ploty, plotz, s=20, c='r')
-    # ax.scatter(16, 16, 5, s=2, c='b')
-    # ax.scatter(0, 0, -2, s=2, c='b')
+    ax.scatter(old[:, 0], old[:, 1], c='r', marker='.', s=30, label='projection position')
+    # ax.scatter(old[:, 0], old[:, 1], old[:, 2], c='', edgecolors='b', marker='o', s=60, label = 'real position')
+    # ax.scatter(new[:, 0], new[:, 1], new[:, 2], c='r', marker='+', s=60, label='estimated position')
+    labelB = False
+    labelN = False
+    labelE = False
+
     for index in range(len(old)):
-        ax.text(old[index][0], old[index][1],old[index][2], index.__str__())
+        if index not in Beacon1List:
+            if labelN == False:
+                # ,edgecolors='g',edgecolors='b',,
+                ax.scatter(old[index, 0], old[index, 1], old[index, 2], c='', edgecolors='b', marker='o', s=30, label='real position')
+                labelN = True
+            else:
+                ax.scatter(old[index, 0], old[index, 1], old[index, 2], c='', edgecolors='b', marker='o', s=30)
+            # # estimated nodes
+            if labelE == False:
+                ax.scatter(new[index, 0], new[index, 1], old[index, 2], c='r', marker='+', s=30, label='estimated position')
+                labelE = True
+            else:
+                ax.scatter(new[index, 0], new[index, 1], old[index, 2], c='r', marker='+', s=30)
+        # Beacon
+        else:
+            if labelB == False:
+                ax.scatter(old[index, 0], old[index, 1], new[index, 2], c='r', marker='v', s=50, label='beacon')
+                labelB = True
+            else:
+                ax.scatter(old[index, 0], old[index, 1], new[index, 2], c='r', marker='v', s=50)
+
+    # for index in range(len(old)):
+    #     ax.text(old[index][0], old[index][1],old[index][2], index.__str__())
         # ax.text(new[index][0], new[index][1], new[index][2], index.__str__())
 
-    X = np.arange(-2, 116, 0.1)
-    Y = np.arange(-4, 116, 0.1)
+    # line
+    for index in range(len(parent)):
+        if index not in Beacon1List and parent[index, 1] != -1 and parent[index, 2] != -1:
+            plt.plot([old[int(parent[index,0]), 0], old[int(parent[index, 1]), 0] ], [old[int(parent[index, 0]), 1], old[int(parent[index,1]), 1]],c='b',linewidth=1)# #808080
+            plt.plot([old[int(parent[index,0]), 0], old[int(parent[index, 2]), 0] ], [old[int(parent[index, 0]), 1], old[int(parent[index,2]), 1]],c='b',linewidth=1)
+
+
+    X = np.arange(-2, 105, 0.1)
+    Y = np.arange(-4, 105, 0.1)
     Z = np.zeros((1, len(X)))
     X, Y = np.meshgrid(X, Y)  # XY平面的网格数据
     ax.plot_surface(X, Y, Z, rstride=8, cstride=8,color='y', alpha=0.3)
+
     plt.legend()
+    plt.savefig(os.path.join(picture_folder, "3D_localization_no_label.pdf"))
+    plt.savefig(os.path.join(picture_folder, "3D_localization_no_label.eps"))
     plt.show()
 
 

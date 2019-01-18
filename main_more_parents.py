@@ -174,7 +174,7 @@ def main():
     for index in range(len(points)):
         print('robot[{}] real_z : estimate_z : {} - {} = {}'.format(index, points[index][2], zList[index], points[index][2]- zList[index]))
 
-    localization_gradient_descent(robots, psolver,  epochs=15)
+    localization_gradient_descent(robots, psolver,  epochs=30)
     localizatiion_GROLO_moreparent(robots, robot_Num - flexiblecount - beacon_Num)
 
 
